@@ -1,8 +1,10 @@
-app.controller('RegistrationController', ['$scope', function($scope) {
-    $scope.login = function() {
-        $scope.message = `Welcome, ${$scope.user.email}!`;
-    }
-    $scope.register = function() {
-        $scope.message = `Welcome, ${$scope.user.firstname}!`;
-    }
+app.controller('RegistrationController', ['$scope', 'Authentication',
+                
+    function($scope, Authentication) {
+        $scope.login = function() {
+            Authentication.login($scope.user);
+        };
+        $scope.register = function() {
+            Authentication.register($scope.user);
+        };
 }]);
