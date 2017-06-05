@@ -1,12 +1,33 @@
-app.factory('Authentication', ['$rootScope', '$firebaseAuth',
+app.factory('Authentication',
+            ['$rootScope', '$location', '$firebaseObject', '$firebaseAuth',
 
-    function ($rootScope, $firebaseAuth) {
+    function ($rootScope, $location, $firebaseObject, $firebaseAuth) {
         let ref = firebase.database().ref();
         let auth = $firebaseAuth();
+        let methods;
 
-        return {
+        auth.$onAuthStateChanged(function(authUser) {
+            if (authUser) {
+                let userRef = ref.child('users').child(authUser.uid);
+                $rootScope.currentUser = $firebaseObject(userRef);
+            } else {
+                $rootScope.currentUser = '';
+            }
+        });
+        
+        methods = {
             login: function (user) {
-                $rootScope.message = `Welcome, ${$rootScope.user.email}!`;
+                auth.$signInWithEmailAndPassword(
+                    user.email,
+                    user.password
+                ).then(function (user) {
+                    $location.path('/success');
+                }).catch(function (error) {
+                    $rootScope.message = error.message;
+                });
+            },
+            logout: function() {
+                return auth.$signOut();
             },
             register: function (user) {
                 auth.$createUserWithEmailAndPassword(
@@ -20,11 +41,15 @@ app.factory('Authentication', ['$rootScope', '$firebaseAuth',
                         lastname: user.lastname,
                         email: user.email
                     });
-                    $rootScope.message = 'Hi ' + user.firstname +
-                        '. Thanks for registering!';
+                    methods.login(user);
                 }).catch(function (error) {
                     $rootScope.message = error.message;
                 });
+            },
+            requireAuth: function() {
+                return auth.$requireSignIn();
             }
         };
+        
+        return methods;
 }]);
