@@ -1,8 +1,26 @@
 <div class="card checkinslist">
     <h1>Check-Ins</h1>
     <p>Here is a list of all your latest check-ins</p>
+    <div class="search cf">
+        <h2>Search Check-ins</h2>
+        <input type="text" ng-model="query" placeholder="Search for users">
+        <div class="formgroup">
+            <span class="label">by:</span>
+            <select ng-model="order">
+                <option value="firstname">First Name</option>
+                <option value="lastname">Last Name</option>
+                <option value="date">Date</option>
+            </select>
+        </div>
+        <div class="formgroup">
+            <input type="radio" id="dirAscending" name="direction" ng-model="direction">
+            <label for="dirAscending">asc</label>&nbsp;
+            <input type="radio" name="direction" value="reverse" id="dirDescending" ng-model="direction">
+            <label for="dirDescending">desc</label>
+        </div>
+    </div>
     <ul class="userlist cf">
-        <li ng-repeat="checkin in checkins">
+        <li ng-repeat="checkin in checkins | orderBy: order:direction | filter: query">
             <div class="checkin">
                 <div class="buttons">
                     <button class="btn btn-delete tooltip" ng-click="deleteCheckin(checkin.$id)">
