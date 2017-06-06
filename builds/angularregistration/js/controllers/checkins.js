@@ -30,4 +30,10 @@ app.controller('CheckInsController',
                 )
             });
         };
+        
+        $scope.deleteCheckin = function(id) {
+            let refToDelete = ref.child(id);
+            let record = $firebaseObject(refToDelete);
+            record.$remove(id);
+        }
 }]);
