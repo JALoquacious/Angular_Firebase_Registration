@@ -1,5 +1,5 @@
-app.controller('MeetingsController', ['$scope', '$firebaseAuth', '$firebaseArray',
-    function ($scope, $firebaseAuth, $firebaseArray) {
+app.controller('MeetingsController', ['$scope', '$rootScope', '$firebaseAuth', '$firebaseArray',
+    function ($scope, $rootScope, $firebaseAuth, $firebaseArray) {
         let ref = firebase.database().ref();
         let auth = $firebaseAuth();
 
@@ -10,15 +10,29 @@ app.controller('MeetingsController', ['$scope', '$firebaseAuth', '$firebaseArray
                     .child(authUser.uid)
                     .child('meetings');
                 let meetingsInfo = $firebaseArray(meetingsRef);
-                
-                $scope.addMeeting = function() {
+
+                $scope.meetings = meetingsInfo;
+
+                meetingsInfo.$loaded().then(function (data) {
+                    $rootScope.meetingCount = meetingsInfo.length;
+                });
+
+                meetingsInfo.$watch(function () {
+                    $rootScope.meetingCount = meetingsInfo.length;
+                });
+
+                $scope.addMeeting = function () {
                     meetingsInfo.$add({
                         name: $scope.meetingName,
                         date: firebase.database.ServerValue.TIMESTAMP
-                    }).then(function() {
+                    }).then(function () {
                         $scope.meetingName = '';
                     });
                 };
+
+                $scope.deleteMeeting = function (key) {
+                    meetingsInfo.$remove(key);
+                }
             }
         });
 }]);
